@@ -96,23 +96,23 @@ def save_to_mongo(datail):
         return True
     return False
 
-def main():
+def main(i):
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) '}
+    urls = 'http://search.51job.com/list/030200%252C00,000000,0000,00,9,99,python,2,{}.html'.format(str(i))
+    url = index_html(headers,urls)
+    for url in url:
+        data = page_one_page(url, headers)
+        # write_to_file(data)
+        if data:save_to_mongo(data)
+
+
+if __name__ == '__main__':
+    pool = Pool()
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) '}
     urls = 'http://search.51job.com/list/030200%252C00,000000,0000,00,9,99,python,2,1.html'
     page = page_html(headers, urls)
-    for i in range(1, int(page) + 1):
-        urls = 'http://search.51job.com/list/030200%252C00,000000,0000,00,9,99,python,2,{}.html'.format(str(i))
-        url = index_html(headers,urls)
-        for url in url:
-            data = page_one_page(url, headers)
-            # write_to_file(data)
-            if data:save_to_mongo(data)
-
-if __name__ == '__main__':
-    # pool = Pool()
-    # pool.map(main, [i for i in range(1, 44)])
-    # pool.close()
-    # pool.join()
-    main()
-
+    pool.map(main, [i for i in range(1,int(page)+1)])
+    pool.close()
+    pool.join()
+    # main()
 
