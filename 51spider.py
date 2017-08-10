@@ -18,11 +18,13 @@ def page_html(headers,urls):
     try:
         r = requests.get(urls, headers=headers)
         time.sleep(5)
-        r.raise_for_status()  # 检测状态码
         r.encoding = r.apparent_encoding  # 编码改为UTF-8
-        pages = re.compile('<span class="td">.*?(\d+).*?</span><input id="jump_page"',re.S)
-        page = pages.findall(r.text)[0]
-        return page
+        if response.status_code == 200:
+            pages = re.compile('<span class="td">.*?(\d+).*?</span><input id="jump_page"',re.S)
+            page = pages.findall(r.text)[0]
+            return page
+        else:
+            print '%s返回码错误'%urls
     except ConnectionError:
         print('Error occurred')
 
@@ -31,17 +33,19 @@ def index_html(headers,url):
 
         r = requests.get(url, headers=headers)
         time.sleep(5)
-        r.raise_for_status()  # 检测状态码
         r.encoding = r.apparent_encoding  # 编码改为UTF-8
-        dome = r.text
-        soup = BeautifulSoup(dome, 'lxml')
-        links = soup.findAll("a", href=re.compile("com\/guangzhou-"))  # 利用正则和BeautifulSoup结合
-        for link in links:
-            urls = link.attrs['href']
-            if urls == None:
-                pass
-            else:
-                yield urls
+        if response.status_code == 200:
+            dome = r.text
+            soup = BeautifulSoup(dome, 'lxml')
+            links = soup.findAll("a", href=re.compile("com\/guangzhou-"))  # 利用正则和BeautifulSoup结合
+            for link in links:
+                urls = link.attrs['href']
+                if urls == None:
+                    pass
+                else:
+                    yield url
+        else:
+            print '%s返回码错误'%urls
     except ConnectionError:
         print('Error occurred')
 
